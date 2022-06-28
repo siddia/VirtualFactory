@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Learning Factory</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="base.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+French+Canon+SC&display=swap" rel="stylesheet">
+  <!--import jQuery which is a JaveScript library-->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+  <script type="text/javascript">
+
+    var correctCards = 0;
+    var totalScore = 0;
+    $( init );
+    
+    function init() {
+    
+      // Make sure the message displayed when game is over is hidden at the start
+      $('#successMessage').hide();
+      $('#successMessage').css( {
+        left: '580px',
+        top: '250px',
+        width: 0,
+        height: 0,
+      } );
+    
+      // Game will be reset
+      correctCards = 0;
+      totalScore = 0;
+      $('#cardPile').html( '' );
+      $('#cardSlots').html( '' );
+    
+      // The following code is to create the left side column (boxes containing the ladder logic)
+      // 1 = normally open
+      // 3 = normally open
+      // 2 = 
+      var numbers = [ 3, 4, 1, 2, 5 ];
+      var terms = ['NC', 'COIL', 'NO', 'NO', 'NO' ];
+      for ( var i=0; i<5; i++ ) {
+        $('<div>' + terms[i] + '</div>').data( 'number', numbers[i] ).attr( 'id', 'card'+numbers[i] ).appendTo( '#cardPile' ).draggable( {
+          
+          stack: '#cardPile div',
+          cursor: 'move',
+          revert: true
+        } ).addClass( 'incorrect' );
+      }
+    
+      // The following code is to create the right side column (boxes to drop logic into)
+      var words = [ '1', '2', '3', '4', '5' ];
+      for ( var i=1; i<=5; i++ ) {
+        $('<div>' + words[i-1] + '</div>').data( 'number', i ).appendTo( '#cardSlots' ).droppable( {
+          accept: '#cardPile div',
+          hoverClass: 'hovered',
+          drop: handleCardDrop
+        } );
+      }
+    }
+    
+    function handleCardDrop( event, ui ) {
+      var slotNumber = $(this).data( 'number' );
+      var cardNumber = ui.draggable.data( 'number' );
+    
+      // If the user drops a the ladder logic on the correct box in the right column, 
+      // we change the card background color and then position the symbol exactly on top of the box. The draggable and droppable ui is disabled so the user can not keep moving the symbols after is has been placed.
+      if ( slotNumber == cardNumber ) {
+        ui.draggable.addClass( 'correct' );
+        ui.draggable.draggable( 'disable' );
+        $(this).droppable( 'disable' );
+        ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+        ui.draggable.draggable( 'option', 'revert', false );
+        correctCards++;
+        totalScore +=20;
+      } 
+      else
+      {
+        totalScore -=20;
+      }
+      
+      // If all the ladder logic symbol is figured correctly, the user will recevier a good job message and the option to play again.
+      if ( correctCards == 5 ) {
+        // If the final calculated score is less than 0% due to too many incorrect drags by the user, we assign them a score of 0% instead of something like -150% which would not make sense.
+        if (totalScore<=0)
+        {
+          totalScore=0;
+        }
+        $('<div>' + 'SCORE: ' + totalScore + '%' + '</div>').appendTo( '#successMessage' );
+        $('#successMessage').show();
+        $('#successMessage').animate( {
+          left: '45%',
+          top: '25%',
+          width: '200px',
+          height: '125px',
+          opacity: 1
+        } );
+      }
+    }
+  </script>
+
+</head>
+<body>
+  <script src="./src/main.js" type="module">
+  </script>
+  <!--Music Script-->
+  <script>
+    function play() {
+      var audio = document.getElementById("audio");
+      audio.play();
+    }
+  </script>
+  <script>
+    var isPlaying=false;
+    var word="SOUND ON";
+    function playMusic() {
+      var music = new Audio('./resources/Sounds/AnimalCrossingMusic.mp3');
+      // Following if statement is required to prevent music from playing multiple times. 
+      // For example, if user clicks the SOUND ON button 10 times, the song will begin playing 10 times at different start times
+      // The code below prevents this from happening
+      if (isPlaying==false)
+      {
+        music.play();
+       isPlaying=true;
+      }
+   }
+  </script>
+
+  <!--
+  <audio id="player" autoplay loop>
+   <source src="./resources/Sounds/AnimalCrossingMusic.mp3" type="audio/mp3">
+  </audio>
+  -->
+  <!--Code for game menu below-->
+  <div class="black-background" id="enterscreen">
+    <div id='stars'></div>
+    <div id='stars2'></div>
+    <div class="container2">
+      <div class="btn" id="stopM" onclick="playMusic()"><a>SOUND ON</a></div>
+      <div class="btn" id="about-team"><a>ABOUT US</a></div>  
+    </div>
+    <div class="stats-title2">The Learning Factory</div>
+      <div class="text-box">
+        <div class="button-wrapper">
+          <!--
+          <div class="button" id="enter">ENTER</div>
+          <audio id="audio" src="./resources/Sounds/click.mp3"></audio>
+          <div class="button" id="contactUs">Contact</div>
+          -->
+        </div>
+        
+        <div class="ui">
+          <div class="infoScreen-ui-layout">
+            <div class="infoScreen-ui-about" id="aboutUsID">
+              <div class="infoScreen-text-title-about" id="infoScreen-text-title">THE TEAM</div>
+              <div class="infoScreen-text-about-R" id="infoScreen-text"> Frontend/Backend Programmer</div>
+              <div class="infoScreen-text-about-email" id="infoScreen-text"> mahetajr@mcmaster.ca</div>
+              <div class="infoScreen-text-about-J" id="infoScreen-text"> Controls Engineer</div>
+              <div class="infoScreen-text-about-email" id="infoScreen-text"> wanjiruj@mcmaster.ca</div>
+              <div class="infoScreen-text-about-B" id="infoScreen-text"> UX/UI Designer</div>
+              <div class="infoScreen-text-about-email" id="infoScreen-text"> basimb@mcmaster.ca</div>
+              <div class="infoScreen-text-about-A" id="infoScreen-text"> CAD Designer</div>
+              <div class="infoScreen-text-about-email" id="infoScreen-text"> siddia18@mcmaster.ca</div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="progress">
+          <div class="progress-value"></div>
+          <div class="button" id="enter">ENTER</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container" id="container">
+    <div class="ui">
+      <div class="quest-journal-layout">
+        <div class="quest-journal" id="quest-journal" onclick="play()">
+          <div class="stats-title">Quests</div>
+          <audio id="audio2" src="./resources/Sounds/AnimalCrossingMusic.mp3"></audio>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="quest-ui-layout">
+        <div class="quest-ui" id="quest-ui">
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+     <!--PLC Ladder Logic Game LEVEL 1-->
+    <div class="ui">
+      <div class="PLC-Game-ui-layout">
+        <div class="PLC-Game-ui" id="PLC-ui">
+
+            <div id="cardPile"></div>
+            <div class="newBox"></div>
+            <div id="cardSlots"></div>
+          
+            <div id="successMessage">
+              <div class="button" id="playAgain" onclick="init()">Play Again</div>
+              <div class="button" id="level2">LEVEL 2</div>
+              <!--<button onclick="init()">Play Again</button>-->
+            </div>
+          
+          <!--<div class="logic-pic1"></div>-->
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+    <!--PLC Ladder Logic Game LEVEL 2-->
+    <div class="ui">
+      <div class="PLC-Game-ui-layout">
+        <div class="PLC-Game-ui" id="PLC-ui-lvl2">
+      
+            <div id="cardPileL2"></div>
+            <div class="newBoxL2"></div>
+            <div id="cardSlotsL2"></div>
+          
+            <div id="successMessageL2">
+              <div class="button" id="playAgainLVL2" onclick="init2()">Play Again</div>
+              <div class="button" id="level3">LEVEL 3</div>
+              <!--<button onclick="init()">Play Again</button>-->
+            </div>
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+    <!--PLC Ladder Logic Game LEVEL 3-->
+    <div class="ui">
+      <div class="PLC-Game-ui-layout">
+        <div class="PLC-Game-ui-l3" id="PLC-ui-lvl3">
+          
+            <div id="cardPileL3"></div>
+            <div class="newBoxL3"></div>
+            <div id="cardSlotsL3"></div>
+              
+            <div id="successMessageL3">
+              <div class="button" id="playAgainLVL3" onclick="init3()">Play Again</div>
+              <div class="button" id="level4">LEVEL 4</div>
+              <!--<button onclick="init()">Play Again</button>-->
+            </div>
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+    <!--PLC Ladder Logic Game LEVEL 4-->
+    <div class="ui">
+      <div class="PLC-Game-ui-layout">
+        <div class="PLC-Game-ui-l4" id="PLC-ui-lvl4">
+          
+            <div id="cardPileL4"></div>
+            <div class="newBoxL4"></div>
+            <div id="cardSlotsL4"></div>
+              
+            <div id="successMessageL4">
+              <div class="button" id="playAgainLVL4" onclick="init4()">Play Again</div>
+              <div class="button" id="finish">FINISH</div>
+              <!--<button onclick="init()">Play Again</button>-->
+            </div>
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+    <!--User Instruction Manual Page Buttons-->
+    <div class="ui">
+      <div class="infoScreen-journal-layout">
+        <div class="infoScreen-journal" id="infoScreen-journal">
+          <div class="stats-title">Instruction Manual</div>
+          <div class="stats-title3">Pages:</div>
+          <div class="page-ui">
+            <div class="page-bar" id="page-bar">
+              <div class="page-bar-item" id="page-bar-infoScreen1" style="background-image: url('./resources/icons/ui/pg1E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen2" style="background-image: url('./resources/icons/ui/pg2E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen3" style="background-image: url('./resources/icons/ui/pg3E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen4" style="background-image: url('./resources/icons/ui/pg4E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen5" style="background-image: url('./resources/icons/ui/pg5E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen6" style="background-image: url('./resources/icons/ui/pg6E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen7" style="background-image: url('./resources/icons/ui/pg7E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen8" style="background-image: url('./resources/icons/ui/pg8E.png');"></div>
+              <div class="page-bar-item" id="page-bar-infoScreen9" style="background-image: url('./resources/icons/ui/pg9E.png');"></div>
+              <!--
+              <div class="page-bar-item" id="page-bar-infoScreen3" style="background-image: url('./resources/icons/ui/qmark-64.png');"></div>
+              -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+     <!--User Instruction Manual-->
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui">
+          <div class="info-pic"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui2">
+          <div class="info-pic2"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui3">
+          <div class="info-pic3"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui4">
+          <div class="info-pic4"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui5">
+          <div class="info-pic5"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui6">
+          <div class="info-pic6"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui7">
+          <div class="info-pic7"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui8">
+          <div class="info-pic8"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="infoScreen-ui-layout">
+        <div class="infoScreen-ui" id="infoScreen-ui9">
+          <div class="info-pic9"></div>
+          <div class="infoScreen-text-title" id="infoScreen-text-title"></div>
+          <div class="infoScreen-text" id="infoScreen-text"></div>
+        </div>
+      </div>
+    </div> 
+    <!---->
+    <!--Main game icons at bottom screen-->
+    <div class="ui">
+      <div class="icon-ui">
+        <div class="icon-bar-clickme">
+        <div class="icon-bar-item-clickme" id="icon-bar-clickme-popup" style="background-image: url('./resources/icons/ui/clickMe.png');"></div>
+        </div>
+        <div class="icon-bar" id="icon-bar">
+          <div class="icon-bar-item" id="icon-bar-infoScreen" style="background-image: url('./resources/icons/ui/helpGame.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-stats" style="background-image: url('./resources/icons/ui/robot64.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-inventory" style="background-image: url('./resources/icons/ui/backpack64.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-quests" style="background-image: url('./resources/icons/ui/scroll64.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-PLC" style="background-image: url('./resources/icons/ui/PLC.png');"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="stats" id="stats">
+        <div class="stats-inner">
+          <div class="stats-title4">Assembly Table</div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Robot Arm
+              <div class="stats-tooltiptext">Arm with sensors that pick and place valve assembly objects.</div>
+            </div>
+            <div id="ordernum1">1</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Valves
+              <div class="stats-tooltiptext">3D printed objects for the assembly line.</div>
+            </div>
+            <div id="ordernum2">2</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Bin
+              <div class="stats-tooltiptext">Storage container for the valves.</div>
+            </div>
+            <div id="ordernum3">3</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">PLC Console
+              <div class="stats-tooltiptext">PLC ladder logic to control the robot arm.</div>
+            </div>
+            <div id="ordernum4">4</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Computer
+              <div class="stats-tooltiptext">Visually monitor activity of the process.</div>
+            </div>
+            <div id="ordernum5">5</div>
+          </div>
+        </div>
+      </div>
+    </div>    
+    <!--Backpack-->
+    <div class="ui">
+      <div class="inventory" id="inventory">
+        <div class="inventory-inner">
+          <div class="inventory-title">Inventory</div>
+          <div class="inventory-row">
+            <div class="inventory-column">
+              <div class="inventory-item" id="inventory-equip-1" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-2" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-3" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-4" draggable="true"></div>
+            </div>
+            <div class="inventory-character"></div>
+            <div class="inventory-column">
+              <div class="inventory-item" id="inventory-equip-5" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-6" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-7" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-8" draggable="true"></div>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <div class="inventory-item" id="inventory-1" draggable="true"></div>
+            <div class="inventory-item" id="inventory-2" draggable="true"></div>
+            <div class="inventory-item" id="inventory-3" draggable="true"></div>
+            <div class="inventory-item" id="inventory-4" draggable="true"></div>
+            <div class="inventory-item" id="inventory-5" draggable="true"></div>
+            <div class="inventory-item" id="inventory-6" draggable="true"></div>
+            <div class="inventory-item" id="inventory-7" draggable="true"></div>
+            <div class="inventory-item" id="inventory-8" draggable="true"></div>
+          </div>
+          <div class="inventory-row">
+            <div class="inventory-item" id="inventory-9" draggable="true"></div>
+            <div class="inventory-item" id="inventory-10" draggable="true"></div>
+            <div class="inventory-item" id="inventory-11" draggable="true"></div>
+            <div class="inventory-item" id="inventory-12" draggable="true"></div>
+            <div class="inventory-item" id="inventory-13" draggable="true"></div>
+            <div class="inventory-item" id="inventory-14" draggable="true"></div>
+            <div class="inventory-item" id="inventory-15" draggable="true"></div>
+            <div class="inventory-item" id="inventory-16" draggable="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<!-- LEVEL 2 -->
+<script type="text/javascript">
+
+  var correctCardsL2 = 0;
+  var totalScoreL2 = 0;
+  $( init2 );
+  
+  function init2() {
+  
+    // Make sure the message displayed when game is over is hidden at the start
+    $('#successMessageL2').hide();
+    $('#successMessageL2').css( {
+      left: '580px',
+      top: '250px',
+      width: 0,
+      height: 0,
+    } );
+  
+    // Game will be reset
+    correctCardsL2 = 0;
+    totalScoreL2 = 0;
+    $('#cardPileL2').html( '' );
+    $('#cardSlotsL2').html( '' );
+  
+    // The following code is to create the left side column (boxes containing the ladder logic)
+    // 1 = normally open
+    // 3 = normally open
+    // 2 = 
+    var numbersL2 = [ 2, 3, 4, 5, 1, 6, 7 ];
+    var termsL2 = ['NO', 'NO', 'NO', 'NO', 'COIL', 'COIL', 'NC' ];
+    for ( var i=0; i<7; i++ ) {
+      $('<div>' + termsL2[i] + '</div>').data( 'numberL2', numbersL2[i] ).attr( 'id', 'card'+numbersL2[i]+'L2' ).appendTo( '#cardPileL2' ).draggable( {
+        
+        stack: '#cardPileL2 div',
+        cursor: 'move',
+        revert: true
+      } ).addClass( 'incorrect' );
+    }
+  
+    // The following code is to create the right side column (boxes to drop logic into)
+    var wordsL2 = [ '1', '2', '3', '4', '5', '6' ];
+    for ( var i=1; i<=6; i++ ) {
+      $('<div>' + wordsL2[i-1] + '</div>').data( 'numberL2', i ).appendTo( '#cardSlotsL2' ).droppable( {
+        accept: '#cardPileL2 div',
+        hoverClass: 'hovered',
+        drop: handleCardDropL2
+      } );
+    }
+  }
+  
+  function handleCardDropL2( event, ui ) {
+    var slotNumberL2 = $(this).data( 'numberL2' );
+    var cardNumberL2 = ui.draggable.data( 'numberL2' );
+  
+    // If the user drops a the ladder logic on the correct box in the right column, 
+    // we change the card background color and then position the symbol exactly on top of the box. The draggable and droppable ui is disabled so the user can not keep moving the symbols after is has been placed.
+    if ( slotNumberL2 == cardNumberL2 ) {
+      ui.draggable.addClass( 'correct' );
+      ui.draggable.draggable( 'disable' );
+      $(this).droppable( 'disable' );
+      ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+      ui.draggable.draggable( 'option', 'revert', false );
+      correctCardsL2++;
+      totalScoreL2 +=16.6;
+    } 
+    else
+    {
+      totalScoreL2 -=16.6;
+    }
+    
+    // If all the ladder logic symbol is figured correctly, the user will recevier a good job message and the option to play again.
+    if ( correctCardsL2 == 6 ) {
+      // If the final calculated score is less than 0% due to too many incorrect drags by the user, we assign them a score of 0% instead of something like -150% which would not make sense.
+      if (totalScoreL2<=0)
+      {
+        totalScoreL2=0;
+      }
+      if (totalScoreL2>=99.6)
+      {
+        totalScoreL2=100;
+      }
+      $('<div>' + 'SCORE: ' + totalScoreL2 + '%' + '</div>').appendTo( '#successMessageL2' );
+      $('#successMessageL2').show();
+      $('#successMessageL2').animate( {
+        left: '45%',
+        top: '25%',
+        width: '200px',
+        height: '125px',
+        opacity: 1
+      } );
+    }
+  }
+</script>
+<!-- LEVEL 3 -->
+<script type="text/javascript">
+
+  var correctCardsL3 = 0;
+  var totalScoreL3 = 0;
+  $( init3 );
+  
+  function init3() {
+  
+    // Make sure the message displayed when game is over is hidden at the start
+    $('#successMessageL3').hide();
+    $('#successMessageL3').css( {
+      left: '580px',
+      top: '250px',
+      width: 0,
+      height: 0,
+    } );
+  
+    // Game will be reset
+    correctCardsL3 = 0;
+    totalScoreL3 = 0;
+    $('#cardPileL3').html( '' );
+    $('#cardSlotsL3').html( '' );
+  
+    // The following code is to create the left side column (boxes containing the ladder logic)
+    // 1 = normally open
+    // 3 = normally open
+    // 2 = 
+    var numbersL3 = [ 1, 2, 6, 7, 4, 8, 3, 5 ];
+    var termsL3 = ['NO', 'NO', 'NO', 'NO', 'NC', 'NC', 'COIL', 'COIL' ];
+    for ( var i=0; i<8; i++ ) {
+      $('<div>' + termsL3[i] + '</div>').data( 'numberL3', numbersL3[i] ).attr( 'id', 'card'+numbersL3[i]+'L3' ).appendTo( '#cardPileL3' ).draggable( {
+        
+        stack: '#cardPileL3 div',
+        cursor: 'move',
+        revert: true
+      } ).addClass( 'incorrect' );
+    }
+  
+    // The following code is to create the right side column (boxes to drop logic into)
+    var wordsL3 = [ '1', '2', '3', '4', '5', '6', '7', '8' ];
+    for ( var i=1; i<=8; i++ ) {
+      $('<div>' + wordsL3[i-1] + '</div>').data( 'numberL3', i ).appendTo( '#cardSlotsL3' ).droppable( {
+        accept: '#cardPileL3 div',
+        hoverClass: 'hovered',
+        drop: handleCardDropL3
+      } );
+    }
+  }
+  
+  function handleCardDropL3( event, ui ) {
+    var slotNumberL3 = $(this).data( 'numberL3' );
+    var cardNumberL3 = ui.draggable.data( 'numberL3' );
+  
+    // If the user drops a the ladder logic on the correct box in the right column, 
+    // we change the card background color and then position the symbol exactly on top of the box. The draggable and droppable ui is disabled so the user can not keep moving the symbols after is has been placed.
+    if ( slotNumberL3 == cardNumberL3 ) {
+      ui.draggable.addClass( 'correct' );
+      ui.draggable.draggable( 'disable' );
+      $(this).droppable( 'disable' );
+      ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+      ui.draggable.draggable( 'option', 'revert', false );
+      correctCardsL3++;
+      totalScoreL3 +=12.5;
+    } 
+    else
+    {
+      totalScoreL3 -=12.5;
+    }
+    
+    // If all the ladder logic symbol is figured correctly, the user will recevier a good job message and the option to play again.
+    if ( correctCardsL3 == 8 ) {
+      // If the final calculated score is less than 0% due to too many incorrect drags by the user, we assign them a score of 0% instead of something like -150% which would not make sense.
+      if (totalScoreL3<=0)
+      {
+        totalScoreL3=0;
+      }
+      $('<div>' + 'SCORE: ' + totalScoreL3 + '%' + '</div>').appendTo( '#successMessageL3' );
+      $('#successMessageL3').show();
+      $('#successMessageL3').animate( {
+        left: '45%',
+        top: '25%',
+        width: '200px',
+        height: '125px',
+        opacity: 1
+      } );
+    }
+  }
+</script>
+<!-- LEVEL 4 -->
+<script type="text/javascript">
+
+  var correctCardsL4 = 0;
+  var totalScoreL4 = 0;
+  $( init4 );
+  
+  function init4() {
+  
+    // Make sure the message displayed when game is over is hidden at the start
+    $('#successMessageL4').hide();
+    $('#successMessageL4').css( {
+      left: '580px',
+      top: '250px',
+      width: 0,
+      height: 0,
+    } );
+  
+    // Game will be reset
+    correctCardsL4 = 0;
+    totalScoreL4 = 0;
+    $('#cardPileL4').html( '' );
+    $('#cardSlotsL4').html( '' );
+  
+    // The following code is to create the left side column (boxes containing the ladder logic)
+    // 1 = normally open
+    // 3 = normally open
+    // 2 = 
+    var numbersL4 = [ 1, 2, 3, 4, 5, 6, 7 ];
+    var termsL4 = ['NO', 'NO', 'NO', 'JMP', 'COIL', 'NC', 'NC' ];
+    for ( var i=0; i<7; i++ ) {
+      $('<div>' + termsL4[i] + '</div>').data( 'numberL4', numbersL4[i] ).attr( 'id', 'card'+numbersL4[i]+'L4' ).appendTo( '#cardPileL4' ).draggable( {
+        
+        stack: '#cardPileL4 div',
+        cursor: 'move',
+        revert: true
+      } ).addClass( 'incorrect' );
+    }
+  
+    // The following code is to create the right side column (boxes to drop logic into)
+    var wordsL4 = [ '1', '2', '3', '4' ];
+    for ( var i=1; i<=4; i++ ) {
+      $('<div>' + wordsL4[i-1] + '</div>').data( 'numberL4', i ).appendTo( '#cardSlotsL4' ).droppable( {
+        accept: '#cardPileL4 div',
+        hoverClass: 'hovered',
+        drop: handleCardDropL4
+      } );
+    }
+  }
+  
+  function handleCardDropL4( event, ui ) {
+    var slotNumberL4 = $(this).data( 'numberL4' );
+    var cardNumberL4 = ui.draggable.data( 'numberL4' );
+  
+    // If the user drops a the ladder logic on the correct box in the right column, 
+    // we change the card background color and then position the symbol exactly on top of the box. The draggable and droppable ui is disabled so the user can not keep moving the symbols after is has been placed.
+    if ( slotNumberL4 == cardNumberL4 ) {
+      ui.draggable.addClass( 'correct' );
+      ui.draggable.draggable( 'disable' );
+      $(this).droppable( 'disable' );
+      ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+      ui.draggable.draggable( 'option', 'revert', false );
+      correctCardsL4++;
+      totalScoreL4 +=25;
+    } 
+    else
+    {
+      totalScoreL4 -=25;
+    }
+    
+    // If all the ladder logic symbol is figured correctly, the user will recevier a good job message and the option to play again.
+    if ( correctCardsL4 == 4 ) {
+      // If the final calculated score is less than 0% due to too many incorrect drags by the user, we assign them a score of 0% instead of something like -150% which would not make sense.
+      if (totalScoreL4<=0)
+      {
+        totalScoreL4=0;
+      }
+      $('<div>' + 'SCORE: ' + totalScoreL4 + '%' + '</div>').appendTo( '#successMessageL4' );
+      $('#successMessageL4').show();
+      $('#successMessageL4').animate( {
+        left: '45%',
+        top: '25%',
+        width: '200px',
+        height: '125px',
+        opacity: 1
+      } );
+    }
+  }
+</script>
+</html>
